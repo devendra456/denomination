@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
-import 'package:number_to_character/number_to_character.dart';
+import 'package:number_to_words_english/number_to_words_english.dart';
 
-var converter = NumberToCharacterConverter('en');
 
 String formatNumberWithCommas(int number) {
   final formatter = NumberFormat('#,###');
@@ -10,7 +9,7 @@ String formatNumberWithCommas(int number) {
 
 String numberToChar(int number) {
   String charNum = "";
-  final text = converter.convertInt(number);
+  final text = NumberToWordsEnglish.convert(number);
   final textArr = text.split(" ");
   for (var element in textArr) {
     final firstElem = element[0].toUpperCase();

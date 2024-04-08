@@ -1,23 +1,13 @@
+import 'package:denomination/app/data/sqflite_service.dart';
 import 'package:get/get.dart';
 
 class HistoryController extends GetxController {
-  //TODO: Implement HistoryController
+  final SQFLiteService sqfLiteService;
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  HistoryController({required this.sqfLiteService});
+
+  Future<List<Map<String, Object?>>?> getSaveData() async {
+    final db = await sqfLiteService.database;
+    return db?.rawQuery("SELECT * FROM Denomination ORDER BY id DESC");
   }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

@@ -1,10 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:denomination/app/modules/home/views/confirmation_dialog.dart';
+import 'package:denomination/app/modules/home/views/remark_dialog.dart';
 import 'package:denomination/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 
-import '../../../core/number_helper.dart';
+import '../../../core/helpers/number_helper.dart';
 import '../controllers/home_controller.dart';
 import 'denomi_item.dart';
 
@@ -24,85 +26,54 @@ class HomeView extends GetView<HomeController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DenomiItem(
-                    amount: 2000,
-                    controller: controller.textEditingController2000,
-                    hintText: "Try 6",
-                    onChanged: (int val) {
-                      controller.count2000 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange2000,
+                    onClearButtonTap: controller.onClearTap2000,
+                    denomiModel: controller.denomi2000,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController500,
-                    amount: 500,
-                    onChanged: (int val) {
-                      controller.count500 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange500,
+                    onClearButtonTap: controller.onClearTap500,
+                    denomiModel: controller.denomi500,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController200,
-                    amount: 200,
-                    onChanged: (int val) {
-                      controller.count200 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange200,
+                    onClearButtonTap: controller.onClearTap200,
+                    denomiModel: controller.denomi200,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController100,
-                    amount: 100,
-                    onChanged: (int val) {
-                      controller.count100 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange100,
+                    onClearButtonTap: controller.onClearTap100,
+                    denomiModel: controller.denomi100,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController50,
-                    amount: 50,
-                    onChanged: (int val) {
-                      controller.count50 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange50,
+                    onClearButtonTap: controller.onClearTap50,
+                    denomiModel: controller.denomi50,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController20,
-                    amount: 20,
-                    onChanged: (int val) {
-                      controller.count20 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange20,
+                    onClearButtonTap: controller.onClearTap20,
+                    denomiModel: controller.denomi20,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController10,
-                    amount: 10,
-                    onChanged: (int val) {
-                      controller.count10 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange10,
+                    onClearButtonTap: controller.onClearTap10,
+                    denomiModel: controller.denomi10,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController5,
-                    amount: 5,
-                    onChanged: (int val) {
-                      controller.count5 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange5,
+                    onClearButtonTap: controller.onClearTap5,
+                    denomiModel: controller.denomi5,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController2,
-                    amount: 2,
-                    onChanged: (int val) {
-                      controller.count2 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange2,
+                    onClearButtonTap: controller.onClearTap2,
+                    denomiModel: controller.denomi2,
                   ),
                   DenomiItem(
-                    controller: controller.textEditingController1,
-                    amount: 1,
-                    onChanged: (int val) {
-                      controller.count1 = val;
-                      controller.updateCount();
-                    },
+                    onChanged: controller.onChange1,
+                    onClearButtonTap: controller.onClearTap1,
+                    denomiModel: controller.denomi1,
                   ),
                 ],
               ),
@@ -120,19 +91,51 @@ class HomeView extends GetView<HomeController> {
                     SpeedDialChild(
                       label: "Clear",
                       child: const Icon(Icons.refresh),
-                      onTap: () {
-                        controller.clearAll();
-                      },
+                      onTap: controller.clearAll,
                     ),
                     SpeedDialChild(
                       label: "Save",
                       child: const Icon(Icons.save_alt_rounded),
-                      onTap: () {},
+                      onTap: () {
+                        _onFloatingSaveTap(context);
+                      },
                     ),
                   ],
                 );
         },
       ),
+    );
+  }
+
+  void _onFloatingSaveTap(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return RemarksDialog(
+          onSavePressed: (type, remarks) {
+            showDialog(
+              context: context,
+              builder: (_) {
+                return ConfirmationDialog(
+                  positiveButtonText: "Yes",
+                  negativeButtonText: "No",
+                  title: "Confirmation",
+                  subTitle: "Are you sure?",
+                  onTapNegative: () {
+                    Navigator.pop(context);
+                  },
+                  onTapPositive: () async {
+                    Navigator.pop(context);
+                    await controller.saveToDatabase(type, remarks);
+                    if (context.mounted) Navigator.pop(context);
+                    controller.clearAll();
+                  },
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 

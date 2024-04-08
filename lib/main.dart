@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:number_to_character/number_to_character.dart';
 
+import 'app/core/di.dart';
 import 'app/routes/app_pages.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await setup();
   runApp(
     GetMaterialApp(
       title: "Application",

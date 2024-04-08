@@ -1,28 +1,21 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:denomination/app/core/number_helper.dart';
+import 'package:denomination/app/core/helpers/number_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class DenomiItem extends StatefulWidget {
-  final int amount;
-  final void Function(int val) onChanged;
-  final String? hintText;
-  final TextEditingController? controller;
+import '../models/denomi_model.dart';
+
+class DenomiItem extends StatelessWidget {
+  final void Function(String val) onChanged;
+  final void Function() onClearButtonTap;
+  final DenomiModel denomiModel;
 
   const DenomiItem({
     super.key,
-    required this.amount,
     required this.onChanged,
-    this.hintText,
-    this.controller,
+    required this.onClearButtonTap,
+    required this.denomiModel,
   });
-
-  @override
-  State<DenomiItem> createState() => _DenomiItemState();
-}
-
-class _DenomiItemState extends State<DenomiItem> {
-  int value = 0;
-  bool showClearButton = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +26,7 @@ class _DenomiItemState extends State<DenomiItem> {
           SizedBox(
             width: 88,
             child: Text(
-              "₹ ${formatNumberWithCommas(widget.amount)}",
+              "₹ ${formatNumberWithCommas(denomiModel.amount)}",
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
@@ -46,34 +39,20 @@ class _DenomiItemState extends State<DenomiItem> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TextField(
               keyboardType: TextInputType.number,
-              controller: widget.controller,
-              onChanged: (val) {
-                if (val.isNotEmpty) {
-                  showClearButton = true;
-                } else {
-                  showClearButton = false;
-                }
-                final intVal = int.tryParse(val) ?? 0;
-                value = intVal * widget.amount;
-                widget.onChanged(value);
-                setState(() {});
-              },
+              controller: denomiModel.controller,
+              onChanged: onChanged,
               decoration: InputDecoration(
                 isDense: true,
-                hintText: widget.hintText,
+                hintText: denomiModel.hintText,
                 contentPadding: const EdgeInsets.all(8),
-                suffixIcon: showClearButton
-                    ? IconButton(
-                        onPressed: () {
-                          widget.controller?.clear();
-                          value = 0;
-                          showClearButton = false;
-                          widget.onChanged(value);
-                          setState(() {});
-                        },
-                        icon: const Icon(Icons.cancel_rounded),
-                      )
-                    : const SizedBox(),
+                suffixIcon: Obx(() {
+                  return denomiModel.showClearButton.value
+                      ? IconButton(
+                          onPressed: onClearButtonTap,
+                          icon: const Icon(Icons.cancel_rounded),
+                        )
+                      : const SizedBox();
+                }),
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -84,15 +63,16 @@ class _DenomiItemState extends State<DenomiItem> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: AutoSizeText(
-              "₹ ${formatNumberWithCommas(value)}",
-              maxLines: 1,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            child: Obx(() {
+              return AutoSizeText(
+                "₹ ${formatNumberWithCommas(denomiModel.value.value)}",
+                maxLines: 1,
+                style: Theme.of(context).textTheme.titleLarge,
+              );
+            }),
           ),
         ],
       ),
     );
   }
-
 }
